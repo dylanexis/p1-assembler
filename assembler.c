@@ -204,55 +204,63 @@ bits 2-0: destReg
 
 /* error check later */
 int add(char *field0, char *field1, char *field2){
-   int val = 0;
+   int instr = 0;
+   int opcode = 0;
    int regA = 0;
    int regB = 0;
    int destReg = 0;
    
-    val = (val << 3);
+
     intCheck(field0);
     regA = atoi(field0);
     regCheck(regA);
-    val += regA;
+
     
-    val = (val << 3);
+
     intCheck(field1);
     regB = atoi(field1);
     regCheck(regB);
-    val += regB;
 
-    val = (val << 15);
+
     intCheck(field2);
     destReg = atoi(field2);
     regCheck(destReg);
-    val += destReg;
+
+    instr = (opcode << 22);
+    instr |= (regA << 19);
+    instr |= (regB << 16);
+    instr |= destReg;
 
     
-   return val;
+   return instr;
 }
 
 int nor(char *field0, char *field1, char *field2){
-    int val = 0;
+    int instr = 0;
+    int opcode = 1;
     int regA = 0;
     int regB = 0;
     int destReg = 0;
     
- 
     intCheck(field0);
     regA = atoi(field0);
     regCheck(regA);
-    
+
     intCheck(field1);
     regB = atoi(field1);
     regCheck(regB);
- 
-    val = (val << 15);
+
     intCheck(field2);
     destReg = atoi(field2);
     regCheck(destReg);
- 
-     
-    return val;
+
+    instr = (opcode << 22);
+    instr |= (regA << 19);
+    instr |= (regB << 16);
+    instr |= destReg;
+
+    
+   return instr;
 }
 
 /*

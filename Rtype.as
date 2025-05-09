@@ -1,2 +1,1 @@
-	add  1  2  3
-	add  4  0  7
+	add     1       2       1       decrement reg1
