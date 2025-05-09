@@ -25,7 +25,7 @@ bool regCheck(int reg);
 
 
 /*R-type Instructions -> opcode, field0, field 1, field2*/
-int add(char *arg0, char *arg1, char *arg2); /*opcode 000*/
+int add(char *field0, char *field1, char *field2); /*opcode 000*/
 
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
@@ -107,12 +107,12 @@ main(int argc, char **argv)
         encoding = add(arg0, arg1, arg2);
     }
 
-    if (!strcmp(opcode, "halt")){
+    else if (!strcmp(opcode, "halt")){
         printf("halt program\n");
         encoding = halt();
     }
 
-    if (!strcmp(opcode, "noop")){
+    else if (!strcmp(opcode, "noop")){
         printf("no operation\n");
         printf("%x", encoding);
         encoding = noop();
@@ -203,18 +203,56 @@ bits 2-0: destReg
 */
 
 /* error check later */
-int add(char *arg0, char *arg1, char *arg2){
+int add(char *field0, char *field1, char *field2){
    int val = 0;
-   intCheck(arg0);
-   val = atoi(arg0);
-   printf("%d",val);
+   int regA = 0;
+   int regB = 0;
+   int destReg = 0;
+   
+    val = (val << 3);
+    intCheck(field0);
+    regA = atoi(field0);
+    regCheck(regA);
+    val += regA;
     
+    val = (val << 3);
+    intCheck(field1);
+    regB = atoi(field1);
+    regCheck(regB);
+    val += regB;
+
+    val = (val << 15);
+    intCheck(field2);
+    destReg = atoi(field2);
+    regCheck(destReg);
+    val += destReg;
+
     
-   return(0);
+   return val;
 }
 
-int nor(char *arg0, char *arg1, char *arg2){
-    return(0);
+int nor(char *field0, char *field1, char *field2){
+    int val = 0;
+    int regA = 0;
+    int regB = 0;
+    int destReg = 0;
+    
+ 
+    intCheck(field0);
+    regA = atoi(field0);
+    regCheck(regA);
+    
+    intCheck(field1);
+    regB = atoi(field1);
+    regCheck(regB);
+ 
+    val = (val << 15);
+    intCheck(field2);
+    destReg = atoi(field2);
+    regCheck(destReg);
+ 
+     
+    return val;
 }
 
 /*
@@ -240,7 +278,7 @@ int noop(){
 
 
 bool intCheck(char *string){
-    if (!isNumber(string)){
+    if (isNumber(string)){
         return true; 
     }
     else {
