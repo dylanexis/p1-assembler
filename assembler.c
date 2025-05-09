@@ -18,6 +18,10 @@ static void checkForBlankLinesInCode(FILE *inFilePtr);
 static inline int isNumber(char *);
 static inline void printHexToFile(FILE *, int);
 
+void printBinary(int word);
+
+
+
 /*R-type Instructions -> opcode, field0, field 1, field2*/
 int add(char *arg0, char *arg1, char *arg2); /*opcode 000*/
 
@@ -98,14 +102,16 @@ main(int argc, char **argv)
     if (!strcmp(opcode, "add")) {
         /* do whatever you need to do for opcode "add" */
         encoding = add(arg0, arg1, arg2);
+        printBinary(encoding);
     }
 
     if (!strcmp(opcode, "halt")){
+        printf("halt program\n");
         encoding = halt();
     }
 
     if (!strcmp(opcode, "noop")){
-        printf("no operation");
+        printf("no operation\n");
         encoding = noop();
     }
 
@@ -118,10 +124,6 @@ main(int argc, char **argv)
        return true */
     if(isNumber("5")) {
         printf("It's a number\n");
-    }
-    else{
-        printf("Unrecognized opcode\n");
-        exit(1);
     }
 
     /* here is an example of using printHexToFile. This will print a
@@ -197,14 +199,17 @@ bits 15-3: unused (should all be 0)
 bits 2-0: destReg
 */
 
+/* error check later */
 int add(char *arg0, char *arg1, char *arg2){
     int val = 0;
-    val += atoi(arg0);
-    val = val >> 9;
-    
-    val += atoi(arg1);
-    val = val << 12;
+    int regA = atoi(arg0);
+    int regB = atoi(arg1);
+    int destReg = atoi(arg2);
 
+    val = (0 << 22);
+    val |= (regA << 19);
+    val |= (regB << 18);
+    val |= (destReg);
     return val;
 }
 
@@ -220,7 +225,8 @@ bits 21-0: unused (should all be 0)
 
 
 int halt(){
-    return(6 << 22);
+    int val = (6 << 22);
+    return val;
 }
 
 int noop(){
@@ -301,4 +307,11 @@ isNumber(char *string)
 static inline void 
 printHexToFile(FILE *outFilePtr, int word) {
     fprintf(outFilePtr, "0x%08X\n", word);
+}
+
+void printBinary(int word){
+    for (int i = 31; i >= 0; i--){
+        printf("%d", (word << 1) & 1);
+    }
+    printf("\n");
 }
