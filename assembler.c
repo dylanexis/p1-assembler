@@ -18,7 +18,9 @@ static void checkForBlankLinesInCode(FILE *inFilePtr);
 static inline int isNumber(char *);
 static inline void printHexToFile(FILE *, int);
 
-void printBinary(int word);
+/* Error checking */
+bool intCheck(char *arg);
+bool regCheck(int reg);
 
 
 
@@ -101,8 +103,8 @@ main(int argc, char **argv)
 
     if (!strcmp(opcode, "add")) {
         /* do whatever you need to do for opcode "add" */
+        printf("add registers\n");
         encoding = add(arg0, arg1, arg2);
-        printBinary(encoding);
     }
 
     if (!strcmp(opcode, "halt")){
@@ -112,11 +114,12 @@ main(int argc, char **argv)
 
     if (!strcmp(opcode, "noop")){
         printf("no operation\n");
+        printf("%x", encoding);
         encoding = noop();
     }
 
     else{
-        printf("Unrecognized opcode\n");
+        printf("Error: Unrecognized opcode\n");
         exit(1);
     }
 
@@ -201,16 +204,13 @@ bits 2-0: destReg
 
 /* error check later */
 int add(char *arg0, char *arg1, char *arg2){
-    int val = 0;
-    int regA = atoi(arg0);
-    int regB = atoi(arg1);
-    int destReg = atoi(arg2);
-
-    val = (0 << 22);
-    val |= (regA << 19);
-    val |= (regB << 18);
-    val |= (destReg);
-    return val;
+   int val = 0;
+   intCheck(arg0);
+   val = atoi(arg0);
+   printf("%d",val);
+    
+    
+   return(0);
 }
 
 int nor(char *arg0, char *arg1, char *arg2){
@@ -230,8 +230,35 @@ int halt(){
 }
 
 int noop(){
-    return(7 << 22);
+    int val = (7 << 22);
+    return val;
 }
+
+
+
+/* Helper functions */
+
+
+bool intCheck(char *string){
+    if (!isNumber(string)){
+        return true; 
+    }
+    else {
+    printf("Error: Non-integer register argument\n");
+        exit(1);
+    }
+}
+
+bool regCheck(int reg){
+    if (reg < 0 || reg > 7){
+        printf("Error: Registers outside the range [0, 7]");
+        exit(1);
+    }
+    else {
+    return true;
+    }
+}
+
 
 
 
@@ -307,11 +334,4 @@ isNumber(char *string)
 static inline void 
 printHexToFile(FILE *outFilePtr, int word) {
     fprintf(outFilePtr, "0x%08X\n", word);
-}
-
-void printBinary(int word){
-    for (int i = 31; i >= 0; i--){
-        printf("%d", (word << 1) & 1);
-    }
-    printf("\n");
 }
