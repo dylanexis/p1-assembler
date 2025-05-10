@@ -21,7 +21,7 @@ static inline void printHexToFile(FILE *, int);
 /* Error checking */
 bool intCheck(char *arg);
 bool regCheck(int reg);
-bool dupeCheck(struct label[MAXLABELLENGTH] label, int labelCount);
+int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCount);
 
 
 struct label{
@@ -35,11 +35,11 @@ int add(char *field0, char *field1, char *field2); /*opcode 000*/
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
 /*I-type Instructions -> */
-int lw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label); //opcode 010
+int lw(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount); //opcode 010
 
-int sw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label); //opcode 011
+int sw(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount); //opcode 011
 
-int beq(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label); //opcode 100
+int beq(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount); //opcode 100
 
 /*J type -> opcode, field0, field1*/
 int jalr(char *field0, char *field1); //opcode 101
@@ -87,19 +87,23 @@ main(int argc, char **argv)
 
   /* First pass here */
 
-    label Labels[MAXLINELENGTH];  
+    struct label labelList[MAXLINELENGTH];  
     int address = 0;
+    int labelCount = 0;
     while(readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
-        if (strlen > 0){
-            strcpy(Labels[address].name, label);
-            Labels[address].address = address;
-            num_labels++;
+        if (strlen(label) > 0){
+            //check duplicates
+            for(int i = 0; i < labelCount; i++){
+                if (strcmp(labelList[i].name, label)){
+                    printf("Error: Duplicate definition of label");
+                    exit(1);
+                }
+            }
+            strcpy(labelList[address].name, label);
+            labelList[address].address = address;
+            labelCount++;
         }
         address++;
-    }
-
-    bool dupeCheck(label, num_labels){
-
     }
 
     /* this is how to rewind the file ptr so that you start reading from the
@@ -108,7 +112,7 @@ main(int argc, char **argv)
     
     
     /* Second pass here */
-    int encoding;
+    int encoding = 0;
     //int address = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
 
@@ -123,15 +127,15 @@ main(int argc, char **argv)
     }
 
     else if(!strcmp(opcode, "lw")){
-        encoding = lw(arg0, arg1, arg2, address, Labels);
+        encoding = lw(arg0, arg1, arg2, address, Labels, labelCount);
     }
 
     else if(!strcmp(opcode, "sw")){
-        encoding = lw(arg0, arg1, arg2, address, Labels);
+        encoding = lw(arg0, arg1, arg2, address, Labels, labelCount);
     }
 
     else if(!strcmp(opcode, "beq")){
-        encoding = lw(arg0, arg1, arg2, address, Labels);
+        encoding = lw(arg0, arg1, arg2, address, Labels, labelCount);
     }
 
     else if (!strcmp(opcode, "jalr")){
@@ -292,16 +296,72 @@ I-type Instructions
     bits 15-0: offsetField (a 16-bit, 2’s complement number with a range of -32768 to 32767)
 */
 
-int lw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label){
+int lw(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount){
+    int opcode = 2;
+    int instr = 0;
+    int offsetField = 0;
+    int regA = 0;
+    int regB = 0;
+
+    intCheck(field0);
+    regA = atoi(field0);
+    regCheck(regA);
+
+    intCheck(field1);
+    regB = atoi(field1);
+    regCheck(regB);
+
+
+    instr = opcode << 22;
+    instr |= regA << 19;
+    instr |= regB << 16;
+    instr |= offsetField;
+    
     return(0);
 } //opcode 010
 
-int sw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label){
+int sw(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount){
+    int opcode = 3;
+    int instr = 0;
+    int offsetField = 0;
+    int regA = 0;
+    int regB = 0;
+
+    intCheck(field0);
+    regA = atoi(field0);
+    regCheck(regA);
+
+    intCheck(field1);
+    regB = atoi(field1);
+    regCheck(regB);
+
+
+    instr = opcode << 22;
+    instr |= regA << 19;
+    instr |= regB << 16;
     return(0);
 } //opcode 011
 
-int beq(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label){
-    return(0);
+int beq(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount){
+    int opcode = 4;
+    int instr = 0;
+    int offsetField = 0;
+    int regA = 0;
+    int regB = 0;
+
+    intCheck(field0);
+    regA = atoi(field0);
+    regCheck(regA);
+
+    intCheck(field1);
+    regB = atoi(field1);
+    regCheck(regB);
+
+
+    instr = opcode << 22;
+    instr |= regA << 19;
+    instr |= regB << 16;
+    instr |= offsetField;
 }//opcode 100
 
 /*
@@ -364,7 +424,7 @@ bool intCheck(char *string){
 
 bool regCheck(int reg){
     if (reg < 0 || reg > 7){
-        printf("Error: Registers outside the range [0, 7]");
+        printf("Error: Registers outside the range [0, 7]\n");
         exit(1);
     }
     else {
@@ -372,10 +432,19 @@ bool regCheck(int reg){
     }
 }
 
-bool dupeCheck(struct label[Labels] label, int labelCount){
-    for(int i = 0; i > labelCount; i++){
-        for(int j = i + 1; j < labelCount;  i++)
+bool offsetCheck(int reg){
+    if (reg < -32768 || reg > 32767){
+        printf("Error: offsetField outside range\n");
+        exit(1);
     }
+    else{
+        return true;
+    }
+
+}
+
+int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCount){
+    for(int i = 0; i < labelCount)
 }
 
 
