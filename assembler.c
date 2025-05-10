@@ -311,6 +311,17 @@ int lw(char *field0, char *field1, char *field2, int address, struct label label
     regB = atoi(field1);
     regCheck(regB);
 
+    //numeric address
+    if (isNumber(field2)){
+        offsetField = atoi(field2);
+        offsetCheck(offsetField);
+
+    }
+    //symbolic address
+    else{
+        offsetField = findLabel(labelList, label, labelCount);
+        offsetCheck(offsetField);
+    }
 
     instr = opcode << 22;
     instr |= regA << 19;
@@ -335,6 +346,18 @@ int sw(char *field0, char *field1, char *field2, int address, struct label label
     regB = atoi(field1);
     regCheck(regB);
 
+    //numeric address
+    if (isNumber(field2)){
+        offsetField = atoi(field2);
+        offsetCheck(offsetField);
+
+    }
+    //symbolic address
+    else{
+        offsetField = findLabel(labelList, label, labelCount);
+        offsetCheck(offsetField);
+    }
+
 
     instr = opcode << 22;
     instr |= regA << 19;
@@ -356,6 +379,16 @@ int beq(char *field0, char *field1, char *field2, int address, struct label labe
     intCheck(field1);
     regB = atoi(field1);
     regCheck(regB);
+
+    if(isNumber(field2)){
+        offsetField = atoi(field2);
+        offsetCheck(offsetField);
+
+    }
+    else{
+    offsetField = findLabel(labelList, label, labelCount);
+    offsetCheck(offsetField);
+    }
 
 
     instr = opcode << 22;
@@ -444,7 +477,13 @@ bool offsetCheck(int reg){
 }
 
 int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCount){
-    for(int i = 0; i < labelCount)
+    for(int i = 0; i < labelCount; i++){
+        if(strcmp(labelList[i].name, label)){
+            return labelList[i].address;
+        }
+    }
+    printf("Error: Use of undefined label");
+    exit(0);
 }
 
 
