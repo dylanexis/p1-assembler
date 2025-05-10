@@ -21,6 +21,7 @@ static inline void printHexToFile(FILE *, int);
 /* Error checking */
 bool intCheck(char *arg);
 bool regCheck(int reg);
+bool offsetCheck(int offset);
 int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCount);
 
 
@@ -319,16 +320,16 @@ int lw(char *field0, char *field1, char *field2, int address, struct label label
     }
     //symbolic address
     else{
-        offsetField = findLabel(labelList, label, labelCount);
+        offsetField = findLabel(labelList, field2, labelCount);
         offsetCheck(offsetField);
     }
 
     instr = opcode << 22;
     instr |= regA << 19;
     instr |= regB << 16;
-    instr |= offsetField;
+    instr |= (offsetField & 0xFFFF);
     
-    return(0);
+    return instr;
 } //opcode 010
 
 int sw(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount){
@@ -354,7 +355,7 @@ int sw(char *field0, char *field1, char *field2, int address, struct label label
     }
     //symbolic address
     else{
-        offsetField = findLabel(labelList, label, labelCount);
+        offsetField = findLabel(labelList, field2, labelCount);
         offsetCheck(offsetField);
     }
 
@@ -362,7 +363,9 @@ int sw(char *field0, char *field1, char *field2, int address, struct label label
     instr = opcode << 22;
     instr |= regA << 19;
     instr |= regB << 16;
-    return(0);
+    instr |= (offsetField & 0xFFFF);
+
+    return instr;
 } //opcode 011
 
 int beq(char *field0, char *field1, char *field2, int address, struct label labelList[MAXLABELLENGTH], int labelCount){
@@ -386,7 +389,7 @@ int beq(char *field0, char *field1, char *field2, int address, struct label labe
 
     }
     else{
-    offsetField = findLabel(labelList, label, labelCount);
+    offsetField = findLabel(labelList, field2, labelCount);
     offsetCheck(offsetField);
     }
 
@@ -394,7 +397,9 @@ int beq(char *field0, char *field1, char *field2, int address, struct label labe
     instr = opcode << 22;
     instr |= regA << 19;
     instr |= regB << 16;
-    instr |= offsetField;
+    instr |= (offsetField & 0xFFFF);
+
+    return instr;
 }//opcode 100
 
 /*
@@ -420,7 +425,6 @@ int jalr(char *field0, char *field1){
 
     instr = (opcode << 22);
     instr |= (regA << 19);
-    instr |= (regB << 16);
 
     return instr;
 }
@@ -465,8 +469,8 @@ bool regCheck(int reg){
     }
 }
 
-bool offsetCheck(int reg){
-    if (reg < -32768 || reg > 32767){
+bool offsetCheck(int offset){
+    if (offset < -32768 || offset > 32767){
         printf("Error: offsetField outside range\n");
         exit(1);
     }
