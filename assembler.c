@@ -35,11 +35,11 @@ int add(char *field0, char *field1, char *field2); /*opcode 000*/
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
 /*I-type Instructions -> */
-int lw(char *field0, char *field1, char *field2, );
+int lw(char *field0, char *field1, char *field2);
 
-int sw(char *field0, char *field1, char *field2,);
+int sw(char *field0, char *field1, char *field2);
 
-int beq(char *field0, char *field1, char *field2,);
+int beq(char *field0, char *field1, char *field2);
 
 /*J type -> opcode, field0, field1
 int jalr(char *field0, char *field1);
@@ -105,23 +105,26 @@ main(int argc, char **argv)
     
     /* Second pass here */
     int encoding;
-    int address = 0;
+    //int address = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
 
     if (!strcmp(opcode, "add")) {
         /* do whatever you need to do for opcode "add" */
-        printf("add registers\n");
+        //printf("add registers\n");
         encoding = add(arg0, arg1, arg2);
     }
 
+    else if (!strcmp(opcode, "nor")){
+        encoding = nor(arg0, arg1, arg2);
+    }
+
     else if (!strcmp(opcode, "halt")){
-        printf("halt program\n");
+        //printf("halt program\n");
         encoding = halt();
     }
 
     else if (!strcmp(opcode, "noop")){
-        printf("no operation\n");
-        printf("%x", encoding);
+        //printf("no operation\n");
         encoding = noop();
     }
 
@@ -132,7 +135,7 @@ main(int argc, char **argv)
 
     /* here is an example of using printHexToFile. This will print a
        machine code word / number in the proper hex format to the output file */
-    address++;
+    //address++;
     printHexToFile(outFilePtr, encoding);
 
 }
