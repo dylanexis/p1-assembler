@@ -11,7 +11,7 @@
 
 //Every LC2K file will contain less than 1000 lines of assembly.
 #define MAXLINELENGTH 1000
-#define MAXLABELLENGTH 6
+#define MAXLABELLENGTH 7
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 static void checkForBlankLinesInCode(FILE *inFilePtr);
@@ -26,7 +26,7 @@ void saveLabel(int address, char name);
 
 struct label{
     int address;
-    char name[7];
+    char name[MAXLABELLENGTH];
 };
 
 /*R-type Instructions -> opcode, field0, field1, field2*/
@@ -35,20 +35,20 @@ int add(char *field0, char *field1, char *field2); /*opcode 000*/
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
 /*I-type Instructions -> */
-int lw(char *field0, char *field1, char *field2, int address);
+int lw(char *field0, char *field1, char *field2, int address); //opcode 010
 
-int sw(char *field0, char *field1, char *field2, int address);
+int sw(char *field0, char *field1, char *field2, int address); //opcode 011
 
-int beq(char *field0, char *field1, char *field2, int address);
+int beq(char *field0, char *field1, char *field2, int address); //opcode 100
 
 /*J type -> opcode, field0, field1*/
-int jalr(char *field0, char *field1);
+int jalr(char *field0, char *field1); //opcode 101
 
 
 /* O-type Instructions -> opcode only */
-int halt(); /* opcode 111*/
+int halt(); // opcode 111
 
-int noop(); /* opcode 110*/
+int noop(); // opcode 110
 
 
 
@@ -89,14 +89,17 @@ main(int argc, char **argv)
 
 
   /* First pass here */
-    
-    while(readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
-        if (!isNumber(arg2)){
-            
-        }
-        
-    }
 
+    label Labels[MAXLINELENGTH];  
+    int address = 0;
+    while(readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+        if (strlen > 0){
+            strcpy(Labels[address].name, label);
+            Labels[address].address = address;
+            num_labels++;
+        }
+        address++;
+    }
 
     /* this is how to rewind the file ptr so that you start reading from the
         beginning of the file */
