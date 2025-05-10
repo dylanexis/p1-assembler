@@ -21,7 +21,7 @@ static inline void printHexToFile(FILE *, int);
 /* Error checking */
 bool intCheck(char *arg);
 bool regCheck(int reg);
-void saveLabel(int address, char name);
+bool dupeCheck(struct label[MAXLABELLENGTH] label, int labelCount);
 
 
 struct label{
@@ -35,11 +35,11 @@ int add(char *field0, char *field1, char *field2); /*opcode 000*/
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
 /*I-type Instructions -> */
-int lw(char *field0, char *field1, char *field2, int address); //opcode 010
+int lw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label); //opcode 010
 
-int sw(char *field0, char *field1, char *field2, int address); //opcode 011
+int sw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label); //opcode 011
 
-int beq(char *field0, char *field1, char *field2, int address); //opcode 100
+int beq(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label); //opcode 100
 
 /*J type -> opcode, field0, field1*/
 int jalr(char *field0, char *field1); //opcode 101
@@ -84,9 +84,6 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    /* here is an example for how to use readAndParse to read a line from
-        inFilePtr */
-
 
   /* First pass here */
 
@@ -99,6 +96,10 @@ main(int argc, char **argv)
             num_labels++;
         }
         address++;
+    }
+
+    bool dupeCheck(label, num_labels){
+
     }
 
     /* this is how to rewind the file ptr so that you start reading from the
@@ -119,6 +120,18 @@ main(int argc, char **argv)
 
     else if (!strcmp(opcode, "nor")){
         encoding = nor(arg0, arg1, arg2);
+    }
+
+    else if(!strcmp(opcode, "lw")){
+        encoding = lw(arg0, arg1, arg2, address, Labels);
+    }
+
+    else if(!strcmp(opcode, "sw")){
+        encoding = lw(arg0, arg1, arg2, address, Labels);
+    }
+
+    else if(!strcmp(opcode, "beq")){
+        encoding = lw(arg0, arg1, arg2, address, Labels);
     }
 
     else if (!strcmp(opcode, "jalr")){
@@ -205,7 +218,6 @@ static void checkForBlankLinesInCode(FILE *inFilePtr) {
     bits 31-25 unused for all
 */
 
-
 /* 
 R-type Instructions
     bits 24-22: opcode
@@ -272,14 +284,25 @@ int nor(char *field0, char *field1, char *field2){
    return instr;
 }
 
-/* 
+/*
 I-type Instructions
     bits 24-22: opcode
     bits 21-19: reg A
     bits 18-16: reg B
     bits 15-0: offsetField (a 16-bit, 2’s complement number with a range of -32768 to 32767)
-
 */
+
+int lw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label){
+    return(0);
+} //opcode 010
+
+int sw(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label){
+    return(0);
+} //opcode 011
+
+int beq(char *field0, char *field1, char *field2, int address, struct label[MAXLABELLENGTH] label){
+    return(0);
+}//opcode 100
 
 /*
 J-type Instructions
@@ -346,6 +369,12 @@ bool regCheck(int reg){
     }
     else {
     return true;
+    }
+}
+
+bool dupeCheck(struct label[Labels] label, int labelCount){
+    for(int i = 0; i > labelCount; i++){
+        for(int j = i + 1; j < labelCount;  i++)
     }
 }
 
