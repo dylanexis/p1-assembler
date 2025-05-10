@@ -1,4 +1,2 @@
-	lw   0  4  four 
-	add  1  8  3 
-	halt
-four .fill 4
+    add 0 8 1        ; register 8 is invalid
+    halt

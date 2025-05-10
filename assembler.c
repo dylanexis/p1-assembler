@@ -35,15 +35,15 @@ int add(char *field0, char *field1, char *field2); /*opcode 000*/
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
 /*I-type Instructions -> */
-int lw(char *field0, char *field1, char *field2);
+int lw(char *field0, char *field1, char *field2, int address);
 
-int sw(char *field0, char *field1, char *field2);
+int sw(char *field0, char *field1, char *field2, int address);
 
-int beq(char *field0, char *field1, char *field2);
+int beq(char *field0, char *field1, char *field2, int address);
 
-/*J type -> opcode, field0, field1
+/*J type -> opcode, field0, field1*/
 int jalr(char *field0, char *field1);
-*/
+
 
 /* O-type Instructions -> opcode only */
 int halt(); /* opcode 111*/
@@ -92,7 +92,7 @@ main(int argc, char **argv)
     
     while(readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
         if (!isNumber(arg2)){
-
+            
         }
         
     }
@@ -116,6 +116,10 @@ main(int argc, char **argv)
 
     else if (!strcmp(opcode, "nor")){
         encoding = nor(arg0, arg1, arg2);
+    }
+
+    else if (!strcmp(opcode, "jalr")){
+        encoding = jalr(arg0, arg1);
     }
 
     else if (!strcmp(opcode, "halt")){
@@ -208,7 +212,6 @@ R-type Instructions
     bits 2-0: destReg
 */
 
-/* error check later */
 int add(char *field0, char *field1, char *field2){
    int instr = 0;
    int opcode = 0;
@@ -275,23 +278,47 @@ I-type Instructions
 
 */
 
+/*
+J-type Instructions
+    bits 24-22: opcode
+    bits 21-19: reg A
+    bits 18-16: reg B
+    bits 15-0: unused (should all be 0)
+*/
+int jalr(char *field0, char *field1){
+    int opcode = 5;
+    int instr = 0;
+    int regA = 0;
+    int regB = 0;
 
+    intCheck(field0);
+    regA = atoi(field0);
+    regCheck(regA);
+
+    intCheck(field1);
+    regB = atoi(field1);
+    regCheck(regB);
+
+    instr = (opcode << 22);
+    instr |= (regA << 19);
+    instr |= (regB << 16);
+
+    return instr;
+}
 
 /*
 O-type Instructions
     bits 24-22: opcode
     bits 21-0: unused (should all be 0)
 */
-
-
 int halt(){
-    int val = (6 << 22);
-    return val;
+    int instr = (6 << 22);
+    return instr;
 }
 
 int noop(){
-    int val = (7 << 22);
-    return val;
+    int instr = (7 << 22);
+    return instr;
 }
 
 
@@ -318,13 +345,6 @@ bool regCheck(int reg){
     return true;
     }
 }
-
-void saveLabel(int address, char name){
-
-}
-
-
-
 
 
 /*
