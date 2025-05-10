@@ -21,24 +21,31 @@ static inline void printHexToFile(FILE *, int);
 /* Error checking */
 bool intCheck(char *arg);
 bool regCheck(int reg);
+void saveLabel(int address, char name);
 
 
+struct label{
+    int address;
+    char name[7];
+};
 
-/*R-type Instructions -> opcode, field0, field 1, field2*/
+/*R-type Instructions -> opcode, field0, field1, field2*/
 int add(char *field0, char *field1, char *field2); /*opcode 000*/
 
 int nor(char *field0, char *field1, char *field2); /*opcode 001*/
 
-/*I-types
-int lw();
+/*I-type Instructions -> */
+int lw(char *field0, char *field1, char *field2, );
 
-int sw();
-//J type
+int sw(char *field0, char *field1, char *field2,);
 
-int jalr();
+int beq(char *field0, char *field1, char *field2,);
+
+/*J type -> opcode, field0, field1
+int jalr(char *field0, char *field1);
 */
 
-/* O-type Instructions */
+/* O-type Instructions -> opcode only */
 int halt(); /* opcode 111*/
 
 int noop(); /* opcode 110*/
@@ -82,10 +89,12 @@ main(int argc, char **argv)
 
 
   /* First pass here */
-    if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+    
+    while(readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+        if (!isNumber(arg2)){
 
-        /* reached end of file */
-        return(0);
+        }
+        
     }
 
 
@@ -95,10 +104,8 @@ main(int argc, char **argv)
     
     
     /* Second pass here */
-
-    /* after doing a readAndParse, you may want to do the following to test the
-        opcode */
     int encoding;
+    int address = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
 
     if (!strcmp(opcode, "add")) {
@@ -123,14 +130,9 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    /* here is an example of using isNumber. "5" is a number, so this will
-       return true */
-    if(isNumber("5")) {
-        printf("It's a number\n");
-    }
-
     /* here is an example of using printHexToFile. This will print a
        machine code word / number in the proper hex format to the output file */
+    address++;
     printHexToFile(outFilePtr, encoding);
 
 }
@@ -194,12 +196,13 @@ static void checkForBlankLinesInCode(FILE *inFilePtr) {
 */
 
 
-/* R-type Instructions
-bits 24-22: opcode
-bits 21-19: reg A
-bits 18-16: reg B
-bits 15-3: unused (should all be 0)
-bits 2-0: destReg
+/* 
+R-type Instructions
+    bits 24-22: opcode
+    bits 21-19: reg A
+    bits 18-16: reg B
+    bits 15-3: unused (should all be 0)
+    bits 2-0: destReg
 */
 
 /* error check later */
@@ -215,7 +218,6 @@ int add(char *field0, char *field1, char *field2){
     regA = atoi(field0);
     regCheck(regA);
 
-    
 
     intCheck(field1);
     regB = atoi(field1);
@@ -231,7 +233,6 @@ int add(char *field0, char *field1, char *field2){
     instr |= (regB << 16);
     instr |= destReg;
 
-    
    return instr;
 }
 
@@ -259,14 +260,24 @@ int nor(char *field0, char *field1, char *field2){
     instr |= (regB << 16);
     instr |= destReg;
 
-    
    return instr;
 }
 
+/* 
+I-type Instructions
+    bits 24-22: opcode
+    bits 21-19: reg A
+    bits 18-16: reg B
+    bits 15-0: offsetField (a 16-bit, 2’s complement number with a range of -32768 to 32767)
+
+*/
+
+
+
 /*
 O-type Instructions
-bits 24-22: opcode
-bits 21-0: unused (should all be 0)
+    bits 24-22: opcode
+    bits 21-0: unused (should all be 0)
 */
 
 
@@ -304,6 +315,11 @@ bool regCheck(int reg){
     return true;
     }
 }
+
+void saveLabel(int address, char name){
+
+}
+
 
 
 
