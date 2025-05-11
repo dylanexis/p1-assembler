@@ -54,6 +54,8 @@ int noop(); // opcode 110
 
 /* Directive */
 
+int fill(char *field0, struct label labelList[MAXLABELLENGTH], int labelCount);
+
 
 int
 main(int argc, char **argv)
@@ -156,7 +158,7 @@ main(int argc, char **argv)
     }
 
     else if (!strcmp(opcode, ".fill")){
-        encoding = fill();
+        encoding = fill(arg0, labelList, labelCount);
     }
 
     else{
@@ -449,6 +451,23 @@ int halt(){
 int noop(){
     int instr = (7 << 22);
     return instr;
+}
+
+int fill(char *field0, struct label labelList[MAXLABELLENGTH], int labelCount){
+    int val = 0;
+
+    if(isNumber(field0)){
+        val = atoi(field0);
+        if (val < -2147483648 || val > 2147483647){
+            printf("Error: instructions out of bounds\n");
+            exit(1);
+        }
+    }
+    else{
+        val = findLabel(labelList, field0, labelCount);
+    }
+
+    return val;
 }
 
 
