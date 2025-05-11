@@ -52,6 +52,7 @@ int halt(); // opcode 111
 
 int noop(); // opcode 110
 
+/* Directive */
 
 
 int
@@ -115,7 +116,7 @@ main(int argc, char **argv)
     
     /* Second pass here */
     int encoding = 0;
-    //int address = 0;
+     address = 0;
     while (readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2)){
 
     if (!strcmp(opcode, "add")) {
@@ -154,6 +155,10 @@ main(int argc, char **argv)
         encoding = noop();
     }
 
+    else if (!strcmp(opcode, ".fill")){
+        encoding = fill();
+    }
+
     else{
         printf("Error: Unrecognized opcode\n");
         exit(1);
@@ -163,6 +168,7 @@ main(int argc, char **argv)
        machine code word / number in the proper hex format to the output file */
     //address++;
     printHexToFile(outFilePtr, encoding);
+    address++;
 
 }
 
@@ -390,7 +396,7 @@ int beq(char *field0, char *field1, char *field2, int address, struct label labe
 
     }
     else{
-    offsetField = findLabel(labelList, field2, labelCount);
+    offsetField = findLabel(labelList, field2, labelCount) - (address + 1);
     offsetCheck(offsetField);
     }
 
@@ -490,6 +496,7 @@ int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCoun
     printf("Error: Use of undefined label");
     exit(0);
 }
+
 
 
 /*
