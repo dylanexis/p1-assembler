@@ -330,12 +330,11 @@ int lw(char *field0, char *field1, char *field2, int address, struct label label
     //symbolic address
     else{
         offsetField = findLabel(labelList, field2, labelCount);
-        offsetCheck(offsetField);
     }
 
-    instr = opcode << 22;
-    instr |= regA << 19;
-    instr |= regB << 16;
+    instr = (opcode << 22);
+    instr |= (regA << 19);
+    instr |= (regB << 16);
     instr |= (offsetField & 0xFFFF);
     
     return instr;
@@ -365,13 +364,12 @@ int sw(char *field0, char *field1, char *field2, int address, struct label label
     //symbolic address
     else{
         offsetField = findLabel(labelList, field2, labelCount);
-        offsetCheck(offsetField);
     }
 
 
-    instr = opcode << 22;
-    instr |= regA << 19;
-    instr |= regB << 16;
+    instr = (opcode << 22);
+    instr |= (regA << 19);
+    instr |= (regB << 16);
     instr |= (offsetField & 0xFFFF);
 
     return instr;
@@ -434,6 +432,7 @@ int jalr(char *field0, char *field1){
 
     instr = (opcode << 22);
     instr |= (regA << 19);
+    instr |= (regB << 16);
 
     return instr;
 }
@@ -513,7 +512,7 @@ int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCoun
         }
     }
     printf("Error: Use of undefined label");
-    exit(0);
+    exit(1);
 }
 
 

@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/assembler",
-            "args": ["spec.as", "spec.mc"],
+            "args": ["testcases/test_all_op.as", "output2.mc"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "C/C++: make assembler"
         }
