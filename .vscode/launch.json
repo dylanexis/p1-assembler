@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/assembler",
-            "args": ["Rtype.as", "Rtype.mc"],
+            "args": ["spec.as", "spec.mc"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "C/C++: make assembler"
         }

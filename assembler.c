@@ -13,6 +13,12 @@
 #define MAXLINELENGTH 1000
 #define MAXLABELLENGTH 7
 
+
+struct label{
+    int address;
+    char name[MAXLABELLENGTH];
+};
+
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 static void checkForBlankLinesInCode(FILE *inFilePtr);
 static inline int isNumber(char *);
@@ -24,11 +30,6 @@ bool regCheck(int reg);
 bool offsetCheck(int offset);
 int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCount);
 
-
-struct label{
-    int address;
-    char name[MAXLABELLENGTH];
-};
 
 /*R-type Instructions -> opcode, field0, field1, field2*/
 int add(char *field0, char *field1, char *field2); /*opcode 000*/
@@ -95,13 +96,13 @@ main(int argc, char **argv)
         if (strlen(label) > 0){
             //check duplicates
             for(int i = 0; i < labelCount; i++){
-                if (strcmp(labelList[i].name, label)){
+                if (!strcmp(labelList[i].name, label)){
                     printf("Error: Duplicate definition of label");
                     exit(1);
                 }
             }
-            strcpy(labelList[address].name, label);
-            labelList[address].address = address;
+            strcpy(labelList[labelCount].name, label);
+            labelList[labelCount].address = address;
             labelCount++;
         }
         address++;
@@ -128,15 +129,15 @@ main(int argc, char **argv)
     }
 
     else if(!strcmp(opcode, "lw")){
-        encoding = lw(arg0, arg1, arg2, address, Labels, labelCount);
+        encoding = lw(arg0, arg1, arg2, address, labelList, labelCount);
     }
 
     else if(!strcmp(opcode, "sw")){
-        encoding = lw(arg0, arg1, arg2, address, Labels, labelCount);
+        encoding = sw(arg0, arg1, arg2, address, labelList, labelCount);
     }
 
     else if(!strcmp(opcode, "beq")){
-        encoding = lw(arg0, arg1, arg2, address, Labels, labelCount);
+        encoding = beq(arg0, arg1, arg2, address, labelList, labelCount);
     }
 
     else if (!strcmp(opcode, "jalr")){
@@ -482,7 +483,7 @@ bool offsetCheck(int offset){
 
 int findLabel(struct label labelList[MAXLABELLENGTH], char *label, int labelCount){
     for(int i = 0; i < labelCount; i++){
-        if(strcmp(labelList[i].name, label)){
+        if(!strcmp(labelList[i].name, label)){
             return labelList[i].address;
         }
     }
