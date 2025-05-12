@@ -65,7 +65,23 @@ main(int argc, char **argv)
 		    printf("memory[%d]=0x%x\n", state.numMemory, state.mem[state.numMemory]);
     }
 
-    //Your code ends here! 
+    if (opcode == 0){
+        reg[D] = reg[A] + reg[B];
+    }
+    
+    else if (opcode == 1){
+        reg[D] = ~(reg[A] | reg[B]);
+    }
+
+    else if (opcode == 2){
+        reg[B] = mem[reg[A] + offset];
+    }
+
+    else if (opcode == 3){
+        reg[A] = mem[reg[B] + offset];
+    }
+
+    else if
 
     return(0);
 }
