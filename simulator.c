@@ -65,26 +65,41 @@ main(int argc, char **argv)
 		    printf("memory[%d]=0x%x\n", state.numMemory, state.mem[state.numMemory]);
     }
 
+    state.pc = 0;
+
+    while(!halt){
+        int instr = state.mem[state.pc];
+        int opcode = (instr >> 22);
+        int regA = (instr >> 19);
+        int regB = (instr >> 16);
+        int destReg = 0;
+        int offsetField = 0;
+
+    // add
     if (opcode == 0){
-        reg[D] = reg[A] + reg[B];
+        destReg = instr & 7;
+        state.reg[destReg] = state.reg[regA] + state.reg[regB];
     }
-    
+    // nor
     else if (opcode == 1){
-        reg[D] = ~(reg[A] | reg[B]);
+        destReg = instr & 7;
+        state.reg[destReg] = ~(state.reg[regA] | state.reg[regB]);
     }
-
+    // lw
     else if (opcode == 2){
-        reg[B] = mem[reg[A] + offset];
+        offsetField = convertNum(instr & 0xFFFF);
+        state.reg[regB] = state.mem[state.reg[regA] + offsetField];
     }
-
+    // sw
     else if (opcode == 3){
-        reg[A] = mem[reg[B] + offset];
+        offsetField = convertNum(instr & 0xFFFF);
+        state.reg[regA] = state.mem[state.reg[regB] + offsetField];
     }
 
-    else if
 
     return(0);
 }
+
 
 /*
 * DO NOT MODIFY ANY OF THE CODE BELOW. 
