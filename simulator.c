@@ -65,39 +65,72 @@ main(int argc, char **argv)
 		    printf("memory[%d]=0x%x\n", state.numMemory, state.mem[state.numMemory]);
     }
 
+    
+    stateType *statePtr = &state;
     state.pc = 0;
+    int halt = 0;
 
     while(!halt){
-        int instr = state.mem[state.pc];
+        int instr = statePtr->mem[statePtr->pc];
         int opcode = (instr >> 22);
         int regA = (instr >> 19);
         int regB = (instr >> 16);
         int destReg = 0;
         int offsetField = 0;
 
+        statePtr->pc++;
+
     // add
     if (opcode == 0){
         destReg = instr & 7;
-        state.reg[destReg] = state.reg[regA] + state.reg[regB];
+        statePtr->reg[destReg] = statePtr->reg[regA] + statePtr->reg[regB];
     }
     // nor
     else if (opcode == 1){
         destReg = instr & 7;
-        state.reg[destReg] = ~(state.reg[regA] | state.reg[regB]);
+        statePtr->reg[destReg] = ~(statePtr->reg[regA] | statePtr->reg[regB]);
     }
     // lw
     else if (opcode == 2){
         offsetField = convertNum(instr & 0xFFFF);
-        state.reg[regB] = state.mem[state.reg[regA] + offsetField];
+        statePtr->reg[regB] = statePtr->mem[statePtr->reg[regA] + offsetField];
     }
     // sw
     else if (opcode == 3){
         offsetField = convertNum(instr & 0xFFFF);
-        state.reg[regA] = state.mem[state.reg[regB] + offsetField];
+        statePtr->reg[regB] = statePtr->mem[statePtr->reg[regA] + offsetField];
     }
 
+    //beq
+    else if (opcode == 4){
+        offsetField = convertNum(instr & 0xFFFF);
+        if (statePtr->reg[regA] == statePtr->reg[regB]){
+            statePtr->pc += offsetField;
+        }
+    }
 
-    return(0);
+    // jalr
+    else if (opcode == 5){
+        statePtr->reg[regB] = (statePtr->pc + 1);
+        statePtr->pc = statePtr->reg[regA];
+    }
+    else if (opcode == 6){
+        halt = 1;
+    }
+    //noop
+    else if (opcode == 7){
+        // do nothing
+    }
+
+    printState(statePtr);
+}
+printf("machine halted\n");
+printf("total of %d instructions executed\n", statePtr->pc);
+printf("final state of machine:\n");
+
+printState(statePtr);
+fclose(filePtr);
+exit(0);
 }
 
 
